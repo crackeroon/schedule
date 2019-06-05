@@ -4,11 +4,11 @@
 VAGRANT_PUBLIC_KEY = "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key"
 ENV['VAGRANT_DEFAULT_PROVIDER'] ||= 'docker'
 ENV['VAGRANT_CWD'] = '/vagrant'
-DOCKER_PORTS = [ "53384:53384" ]
+DOCKER_PORTS = [ "5000:5000" ]
 
 Vagrant.configure("2") do |config|
   config.vm.provider "docker" do |d|
-    d.image = "mono:latest"
+    d.image = "microsoft/dotnet:2.1-sdk"
     d.ports = DOCKER_PORTS
     d.force_host_vm = false
     d.has_ssh = true
@@ -17,7 +17,7 @@ Vagrant.configure("2") do |config|
     d.cmd = ['/bin/bash', '-c'].push(%{
       apt-get update
       apt-get upgrade -y
-      apt-get install -y openssh-server locales sudo
+      apt-get install -y openssh-server locales sudo make
       echo "PubkeyAuthentication yes" >> /etc/ssh/sshd_config
       useradd --create-home --shell /bin/bash --user-group vagrant
       echo vagrant:vagrant | chpasswd
@@ -38,6 +38,8 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.synced_folder ".", "/vagrant"
+
+  # config.vm.provision "shell", inline: "make -C /vagrant -f Makefile.debian deps"
 
   config.vm.provision "shell", inline: <<-SHELL
     echo "cd /vagrant" >> /home/vagrant/.profile

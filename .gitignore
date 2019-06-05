@@ -2,3 +2,4 @@
 .vagrant/
 timetable/bin/
 timetable/obj/
+timetable/timetable.db

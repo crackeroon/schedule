@@ -8,13 +8,16 @@ help:
 	echo "build - build project"
 	echo "run - start project"
 
+timetable/timetable.db:
+	dotnet ef database -p timetable -s timetable update
+
 restore:
 	dotnet restore timetable/timetable.csproj
 
 build:
 	dotnet build
 
-run: build
+run: build | timetable/timetable.db
 	dotnet run server.urls=http://0.0.0.0:5000 -p timetable
 
 migrate:
